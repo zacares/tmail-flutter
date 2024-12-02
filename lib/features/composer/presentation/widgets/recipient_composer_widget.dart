@@ -297,6 +297,7 @@ class _RecipientComposerWidgetState extends State<RecipientComposerWidget> {
                           maxWidth: widget.maxWidth,
                           onDeleteTagAction: (emailAddress) => _handleDeleteTagAction.call(emailAddress, stateSetter),
                           onShowFullAction: widget.onShowFullListEmailAddressAction,
+                          onEditRecipientAction: widget.onEditRecipientAction,
                         );
                       },
                       onTagChanged: (value) => _handleOnTagChangeAction.call(value, stateSetter),

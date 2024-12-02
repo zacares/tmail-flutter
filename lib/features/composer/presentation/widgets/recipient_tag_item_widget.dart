@@ -94,6 +94,11 @@ class RecipientTagItemWidget extends StatelessWidget {
         onDoubleTap: _handleDoubleTapAction,
         child: tagWidget,
       );
+    } else if (PlatformInfo.isMobile) {
+      tagWidget = GestureDetector(
+        onLongPress: _handleLongPressAction,
+        child: tagWidget,
+      );
     }
 
     if (PlatformInfo.isWeb || isTestingForWeb) {
@@ -176,6 +181,10 @@ class RecipientTagItemWidget extends StatelessWidget {
   }
 
   void _handleDoubleTapAction() {
+    onEditRecipientAction?.call(prefix, currentEmailAddress);
+  }
+
+  void _handleLongPressAction() {
     onEditRecipientAction?.call(prefix, currentEmailAddress);
   }
 }
