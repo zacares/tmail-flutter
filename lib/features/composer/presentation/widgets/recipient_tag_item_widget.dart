@@ -31,6 +31,7 @@ class RecipientTagItemWidget extends StatelessWidget {
   final OnShowFullListEmailAddressAction? onShowFullAction;
   final OnDeleteTagAction? onDeleteTagAction;
   final bool isTestingForWeb;
+  final OnEditRecipientAction? onEditRecipientAction;
 
   const RecipientTagItemWidget({
     super.key,
@@ -47,6 +48,7 @@ class RecipientTagItemWidget extends StatelessWidget {
     this.onShowFullAction,
     this.onDeleteTagAction,
     this.maxWidth,
+    this.onEditRecipientAction,
   });
 
   @override
@@ -86,6 +88,13 @@ class RecipientTagItemWidget extends StatelessWidget {
         : null,
       onDeleted: () => onDeleteTagAction?.call(currentEmailAddress),
     );
+
+    if (PlatformInfo.isWeb || isTestingForWeb) {
+      tagWidget = GestureDetector(
+        onDoubleTap: _handleDoubleTapAction,
+        child: tagWidget,
+      );
+    }
 
     if (PlatformInfo.isWeb || isTestingForWeb) {
       tagWidget = Draggable<DraggableEmailAddress>(
@@ -164,5 +173,9 @@ class RecipientTagItemWidget extends StatelessWidget {
         color: AppColor.colorBorderEmailAddressInvalid
       );
     }
+  }
+
+  void _handleDoubleTapAction() {
+    onEditRecipientAction?.call(prefix, currentEmailAddress);
   }
 }
