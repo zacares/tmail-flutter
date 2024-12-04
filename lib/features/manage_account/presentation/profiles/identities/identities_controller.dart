@@ -12,7 +12,9 @@ import 'package:get/get.dart';
 import 'package:jmap_dart_client/jmap/account_id.dart';
 import 'package:jmap_dart_client/jmap/core/capability/capability_identifier.dart';
 import 'package:jmap_dart_client/jmap/core/session/session.dart';
+import 'package:jmap_dart_client/jmap/core/unsigned_int.dart';
 import 'package:jmap_dart_client/jmap/identities/identity.dart';
+import 'package:model/extensions/identity_extension.dart';
 import 'package:model/extensions/identity_request_dto_extension.dart';
 import 'package:tmail_ui_user/features/base/before_reconnect_handler.dart';
 import 'package:tmail_ui_user/features/base/before_reconnect_manager.dart';
@@ -72,7 +74,6 @@ class IdentitiesController extends ReloadableController implements BeforeReconne
   final SaveIdentityCacheOnWebInteractor _saveIdentityCacheOnWebInteractor;
 
   final identitySelected = Rxn<Identity>();
-  final signatureSelected = Rxn<String>();
   final listAllIdentities = <Identity>[].obs;
   final mapIdentitySignatures = <IdentityId, String>{}.obs;
   final identitiesViewState = Rx<Either<Failure, Success>>(Right(UIState.idle));
@@ -538,6 +539,23 @@ class IdentitiesController extends ReloadableController implements BeforeReconne
       session!.username,
       identityCache: identityCache
     ));
+  }
+
+  void setIdentityAsDefault(Identity? identity) {
+    final accountId = accountDashBoardController.accountId.value;
+    final session = accountDashBoardController.sessionCurrent;
+
+    if (identity == null || accountId == null || session == null) return;
+
+    identitySelected.value = identity;
+
+    final editIdentityRequest = EditIdentityRequest(
+      identityId: identity.id!,
+      identityRequest: identity.toIdentityRequest(sortOrder: UnsignedInt(0)),
+      isDefaultIdentity: true,
+    );
+
+    _editIdentityAction(session, accountId, editIdentityRequest);
   }
 
   @override

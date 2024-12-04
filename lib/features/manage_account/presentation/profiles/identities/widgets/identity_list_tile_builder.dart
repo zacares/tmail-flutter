@@ -5,6 +5,7 @@ import 'package:core/presentation/state/failure.dart';
 import 'package:core/presentation/state/success.dart';
 import 'package:core/presentation/utils/responsive_utils.dart';
 import 'package:core/presentation/views/button/tmail_button_widget.dart';
+import 'package:core/utils/platform_info.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:jmap_dart_client/jmap/identities/identity.dart';
@@ -123,7 +124,7 @@ class IdentityListTileBuilder extends StatelessWidget {
         children: [
           Radio<Identity>(
             value: identity,
-            splashRadius: 24,
+            splashRadius: PlatformInfo.isWeb ? 18 : 24,
             groupValue: identitySelected,
             fillColor: WidgetStateProperty.resolveWith<Color>((states) {
               if (states.contains(WidgetState.selected)) {

@@ -91,6 +91,7 @@ class IdentitiesView extends GetWidget<IdentitiesController> {
                   identitySelected: controller.identitySelected.value,
                   mapIdentitySignatures: controller.mapIdentitySignatures,
                   signatureViewState: controller.signatureViewState.value,
+                  onSelectIdentityAction: controller.setIdentityAsDefault,
                   onEditIdentityAction: (identitySelected) =>
                       controller.goToEditIdentity(context, identitySelected),
                   onDeleteIdentityAction: (identitySelected) =>
