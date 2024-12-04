@@ -39,6 +39,8 @@ class SignatureBuilder extends StatelessWidget {
       return HtmlContentViewer(
         contentHtml: value,
         initialWidth: width,
+        adjustHeight: true,
+        contentPadding: 0,
         direction: AppUtils.getCurrentDirection(context),
       );
     }
