@@ -230,10 +230,25 @@ void main() {
       'should only show identities with name not empty',
     () async {
       // arrange
-      final identity1 = Identity(name: '', mayDelete: true);
-      final identity2 = Identity(mayDelete: true);
-      final identity3 = Identity(name: 'valid name', mayDelete: true);
-      final identity4 = Identity(name: '    ', mayDelete: true);
+      final identity1 = Identity(
+        id: IdentityId(Id('identity1')),
+        name: '',
+        mayDelete: true,
+      );
+      final identity2 = Identity(
+        id: IdentityId(Id('identity2')),
+        mayDelete: true,
+      );
+      final identity3 = Identity(
+        id: IdentityId(Id('identity3')),
+        name: 'valid name',
+        mayDelete: true,
+      );
+      final identity4 = Identity(
+        id: IdentityId(Id('identity4')),
+        name: '    ',
+        mayDelete: true,
+      );
       when(mockGetAllIdentitiesInteractor.execute(any, any, properties: anyNamed('properties')))
         .thenAnswer((_) => Stream.value(Right(GetAllIdentitiesSuccess(
           [identity1, identity2, identity3, identity4],
