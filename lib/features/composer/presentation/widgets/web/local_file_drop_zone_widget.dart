@@ -98,7 +98,7 @@ class LocalFileDropZoneWidget extends StatelessWidget {
           fileSize: bytes?.length ?? 0,
           bytes: bytes,
           isInline: item.platformFormats.firstOrNull?.startsWith(Constant.imageType),
-          type: item.platformFormats.firstOrNull,
+          type: item.platformFormats.firstOrNull ?? Constant.octetStreamMimeType,
         );
       },
     ));
