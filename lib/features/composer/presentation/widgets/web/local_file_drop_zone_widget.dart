@@ -10,12 +10,13 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:model/upload/file_info.dart';
 import 'package:super_clipboard/super_clipboard.dart';
 import 'package:super_drag_and_drop/super_drag_and_drop.dart';
+import 'package:tmail_ui_user/features/composer/presentation/mixin/drag_drog_file_mixin.dart';
 import 'package:tmail_ui_user/features/composer/presentation/styles/web/drop_zone_widget_style.dart';
 import 'package:tmail_ui_user/main/localizations/app_localizations.dart';
 
 typedef OnSuperFileDrop = void Function(List<FileInfo> fileInfos);
 
-class LocalFileDropZoneWidget extends StatelessWidget {
+class LocalFileDropZoneWidget extends StatelessWidget with DragDropFileMixin {
 
   final ImagePaths imagePaths;
   final double? width;
@@ -44,7 +45,7 @@ class LocalFileDropZoneWidget extends StatelessWidget {
     return DropRegion(
       formats: allowedFormats,
       onDropOver: (_) => DropOperation.copy,
-      onPerformDrop: _onFileDrop,
+      onPerformDrop: (performDropEvent) => _onFileDrop(context, performDropEvent),
       hitTestBehavior: HitTestBehavior.opaque,
       child: SizedBox(
         width: width,
@@ -85,25 +86,30 @@ class LocalFileDropZoneWidget extends StatelessWidget {
     );
   }
 
-  Future<void> _onFileDrop(PerformDropEvent performDropEvent) async {
-    final items = performDropEvent.session.items;
-    final listFileInfo = await Future.wait(items.map(
-      (item) async {
-        final dataReaderFile = await item.dataReader?.getFileFuture(
-          SimpleFileFormat(mimeTypes: item.platformFormats)
-        );
-        final bytes = await dataReaderFile?.readAll();
-        return FileInfo(
-          fileName: dataReaderFile?.fileName ?? await item.dataReader?.getSuggestedName() ?? '',
-          fileSize: bytes?.length ?? 0,
-          bytes: bytes,
-          isInline: item.platformFormats.firstOrNull?.startsWith(Constant.imageType),
-          type: item.platformFormats.firstOrNull ?? Constant.octetStreamMimeType,
-        );
+  Future<void> _onFileDrop(BuildContext context, PerformDropEvent performDropEvent) async {
+    await showFutureLoadingDialogFullScreen(
+      context: context,
+      future: () async {
+        final items = performDropEvent.session.items;
+        final listFileInfo = await Future.wait(items.map(
+          (item) async {
+            final dataReaderFile = await item.dataReader?.getFileFuture(
+              SimpleFileFormat(mimeTypes: item.platformFormats)
+            );
+            final bytes = await dataReaderFile?.readAll();
+            return FileInfo(
+              fileName: dataReaderFile?.fileName ?? await item.dataReader?.getSuggestedName() ?? '',
+              fileSize: bytes?.length ?? 0,
+              bytes: bytes,
+              isInline: item.platformFormats.firstOrNull?.startsWith(Constant.imageType),
+              type: item.platformFormats.firstOrNull ?? Constant.octetStreamMimeType,
+            );
+          },
+        ));
+        
+        onSuperDrop?.call(listFileInfo);
       },
-    ));
-    
-    onSuperDrop?.call(listFileInfo);
+    );
   }
 }
 
