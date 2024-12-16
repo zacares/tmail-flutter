@@ -130,7 +130,6 @@ class ComposerController extends BaseController
   final replyToRecipientState = PrefixRecipientState.disabled.obs;
   final identitySelected = Rxn<Identity>();
   final listFromIdentities = RxList<Identity>();
-  final isDroppedFileProcessing = false.obs;
 
   final LocalFilePickerInteractor _localFilePickerInteractor;
   final LocalImagePickerInteractor _localImagePickerInteractor;
@@ -287,7 +286,6 @@ class ComposerController extends BaseController
     }
     _identityContentOnOpenPolicy = SignatureStatus.editedAvailable;
     responsiveContainerKey = null;
-    isDroppedFileProcessing.value = false;
     super.onClose();
   }
 
@@ -449,7 +447,6 @@ class ComposerController extends BaseController
       event.preventDefault();
 
       if (event.dataTransfer.types.validateFilesTransfer) {
-        isDroppedFileProcessing.value = true;
         mailboxDashBoardController.localFileDraggableAppState.value = DraggableAppState.inActive;
       }
     });
@@ -2302,7 +2299,6 @@ class ComposerController extends BaseController
     required List<FileInfo> listFileInfo,
     required double maxWidth
   }) async {
-    isDroppedFileProcessing.value = false;
     _setUpMaxWidthInlineImage(context: context, maxWidth: maxWidth);
 
     if (listFileInfo.isEmpty && context.mounted) {

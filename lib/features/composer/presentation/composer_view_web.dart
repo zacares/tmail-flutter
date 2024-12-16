@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:model/email/prefix_email_address.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
-import 'package:tmail_ui_user/features/base/widget/circle_loading_widget.dart';
 import 'package:tmail_ui_user/features/base/widget/popup_item_widget.dart';
 import 'package:tmail_ui_user/features/composer/presentation/composer_controller.dart';
 import 'package:tmail_ui_user/features/composer/presentation/model/prefix_recipient_state.dart';
@@ -310,13 +309,6 @@ class ComposerView extends GetWidget<ComposerController> {
                                         maxWidth: constraintsEditor.maxWidth,
                                       ),
                                   )
-                                ),
-                              );
-                            } else if (controller.isDroppedFileProcessing.value) {
-                              return const Center(
-                                child: CircleLoadingWidget(
-                                  size: 80,
-                                  strokeWidth: 4,
                                 ),
                               );
                             } else {
@@ -626,13 +618,6 @@ class ComposerView extends GetWidget<ComposerController> {
                                 )
                               ),
                             );
-                          } else if (controller.isDroppedFileProcessing.value) {
-                            return const Center(
-                              child: CircleLoadingWidget(
-                                size: 80,
-                                strokeWidth: 4,
-                              ),
-                            );
                           } else {
                             return const SizedBox.shrink();
                           }
@@ -916,13 +901,6 @@ class ComposerView extends GetWidget<ComposerController> {
                                   height: constraintsBody.maxHeight,
                                   onAttachmentDropZoneListener: controller.onAttachmentDropZoneListener,
                                 )
-                              ),
-                            );
-                          } else if (controller.isDroppedFileProcessing.value) {
-                            return const Center(
-                              child: CircleLoadingWidget(
-                                size: 80,
-                                strokeWidth: 4,
                               ),
                             );
                           } else {
