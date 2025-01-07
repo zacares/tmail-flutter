@@ -2,6 +2,7 @@ import 'package:core/utils/app_logger.dart';
 import 'package:model/oidc/token_oidc.dart';
 import 'package:tmail_ui_user/features/caching/clients/token_oidc_cache_client.dart';
 import 'package:tmail_ui_user/features/login/data/extensions/token_oidc_cache_extension.dart';
+import 'package:tmail_ui_user/features/login/data/extensions/token_oidc_extension.dart';
 import 'package:tmail_ui_user/features/login/data/local/token_oidc_cache_manager.dart';
 import 'package:tmail_ui_user/features/login/data/model/token_oidc_cache.dart';
 import 'package:tmail_ui_user/features/login/domain/exceptions/authentication_exception.dart';
@@ -43,12 +44,7 @@ class WebTokenOidcCacheManager extends TokenOidcCacheManager {
     log('TokenOidcCacheManager::persistOneTokenOidc(): key: ${tokenOIDC.tokenId.uuid}');
     log('TokenOidcCacheManager::persistOneTokenOidc(): key\'s hash: ${tokenOIDC.tokenIdHash}');
     log('TokenOidcCacheManager::persistOneTokenOidc(): token: ${tokenOIDC.token}');
-    final tokenHiveCache = TokenOidcCache(
-      '',
-      tokenOIDC.tokenId.uuid,
-      tokenOIDC.refreshToken,
-      expiredTime: tokenOIDC.expiredTime,
-    );
+    final tokenHiveCache = tokenOIDC.toTokenOidcCacheWithoutToken();
     await _tokenOidcCacheClient.insertItem(tokenOIDC.tokenIdHash, tokenHiveCache);
     window.sessionStorage[_sessionStorageTokenKey] = tokenOIDC.token;
     log('TokenOidcCacheManager::persistOneTokenOidc(): done');
