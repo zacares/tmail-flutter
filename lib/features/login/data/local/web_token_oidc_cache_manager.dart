@@ -1,5 +1,6 @@
 import 'package:core/utils/app_logger.dart';
 import 'package:model/oidc/token_oidc.dart';
+import 'package:tmail_ui_user/features/caching/clients/token_oidc_cache_client.dart';
 import 'package:tmail_ui_user/features/login/data/extensions/token_oidc_cache_extension.dart';
 import 'package:tmail_ui_user/features/login/data/local/token_oidc_cache_manager.dart';
 import 'package:tmail_ui_user/features/login/data/model/token_oidc_cache.dart';
@@ -7,14 +8,17 @@ import 'package:tmail_ui_user/features/login/domain/exceptions/authentication_ex
 import 'package:universal_html/html.dart';
 
 class WebTokenOidcCacheManager extends TokenOidcCacheManager {
-  const WebTokenOidcCacheManager(super.tokenOidcCacheClient);
+  const WebTokenOidcCacheManager(this._tokenOidcCacheClient)
+    : super(_tokenOidcCacheClient);
+
+  final TokenOidcCacheClient _tokenOidcCacheClient;
 
   static const _sessionStorageTokenKey = 'twake_mail_token_session_storage';
 
   @override
   Future<TokenOIDC> getTokenOidc(String tokenIdHash) async {
     log('WebTokenOidcCacheManager::getTokenOidc(): tokenIdHash: $tokenIdHash');
-    final tokenHiveCache = await tokenOidcCacheClient.getItem(tokenIdHash);
+    final tokenHiveCache = await _tokenOidcCacheClient.getItem(tokenIdHash);
     final tokenSessionStorageCache = window.sessionStorage[_sessionStorageTokenKey];
     log('WebTokenOidcCacheManager::getTokenOidc(): tokenHiveCache: $tokenHiveCache');
     log('WebTokenOidcCacheManager::getTokenOidc(): tokenSessionStorageCache: $tokenSessionStorageCache');
@@ -35,7 +39,7 @@ class WebTokenOidcCacheManager extends TokenOidcCacheManager {
   @override
   Future<void> persistOneTokenOidc(TokenOIDC tokenOIDC) async {
     log('TokenOidcCacheManager::persistOneTokenOidc(): $tokenOIDC');
-    await tokenOidcCacheClient.clearAllData();
+    await _tokenOidcCacheClient.clearAllData();
     log('TokenOidcCacheManager::persistOneTokenOidc(): key: ${tokenOIDC.tokenId.uuid}');
     log('TokenOidcCacheManager::persistOneTokenOidc(): key\'s hash: ${tokenOIDC.tokenIdHash}');
     log('TokenOidcCacheManager::persistOneTokenOidc(): token: ${tokenOIDC.token}');
@@ -45,14 +49,14 @@ class WebTokenOidcCacheManager extends TokenOidcCacheManager {
       tokenOIDC.refreshToken,
       expiredTime: tokenOIDC.expiredTime,
     );
-    await tokenOidcCacheClient.insertItem(tokenOIDC.tokenIdHash, tokenHiveCache);
+    await _tokenOidcCacheClient.insertItem(tokenOIDC.tokenIdHash, tokenHiveCache);
     window.sessionStorage[_sessionStorageTokenKey] = tokenOIDC.token;
     log('TokenOidcCacheManager::persistOneTokenOidc(): done');
   }
 
   @override
   Future<void> deleteTokenOidc() async {
-    await tokenOidcCacheClient.clearAllData();
+    await _tokenOidcCacheClient.clearAllData();
     window.sessionStorage.remove(_sessionStorageTokenKey);
   }
 }

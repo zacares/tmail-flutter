@@ -6,13 +6,13 @@ import 'package:tmail_ui_user/features/login/data/extensions/token_oidc_extensio
 import 'package:tmail_ui_user/features/login/domain/exceptions/authentication_exception.dart';
 
 class TokenOidcCacheManager {
-  final TokenOidcCacheClient tokenOidcCacheClient;
+  final TokenOidcCacheClient _tokenOidcCacheClient;
 
-  const TokenOidcCacheManager(this.tokenOidcCacheClient);
+  const TokenOidcCacheManager(this._tokenOidcCacheClient);
 
   Future<TokenOIDC> getTokenOidc(String tokenIdHash) async {
     log('TokenOidcCacheManager::getTokenOidc(): tokenIdHash: $tokenIdHash');
-    final tokenCache = await tokenOidcCacheClient.getItem(tokenIdHash);
+    final tokenCache = await _tokenOidcCacheClient.getItem(tokenIdHash);
     log('TokenOidcCacheManager::getTokenOidc(): tokenCache: $tokenCache');
     if (tokenCache == null) {
       throw NotFoundStoredTokenException();
@@ -23,17 +23,17 @@ class TokenOidcCacheManager {
 
   Future<void> persistOneTokenOidc(TokenOIDC tokenOIDC) async {
     log('TokenOidcCacheManager::persistOneTokenOidc(): $tokenOIDC');
-    await tokenOidcCacheClient.clearAllData();
+    await _tokenOidcCacheClient.clearAllData();
     log('TokenOidcCacheManager::persistOneTokenOidc(): key: ${tokenOIDC.tokenId.uuid}');
     log('TokenOidcCacheManager::persistOneTokenOidc(): key\'s hash: ${tokenOIDC.tokenIdHash}');
     log('TokenOidcCacheManager::persistOneTokenOidc(): token: ${tokenOIDC.token}');
-    await tokenOidcCacheClient.insertItem(tokenOIDC.tokenIdHash, tokenOIDC.toTokenOidcCache());
+    await _tokenOidcCacheClient.insertItem(tokenOIDC.tokenIdHash, tokenOIDC.toTokenOidcCache());
     log('TokenOidcCacheManager::persistOneTokenOidc(): done');
   }
 
   Future<void> deleteTokenOidc() async {
-    await tokenOidcCacheClient.clearAllData();
+    await _tokenOidcCacheClient.clearAllData();
   }
 
-  Future<void> closeTokenOIDCHiveCacheBox() => tokenOidcCacheClient.closeBox();
+  Future<void> closeTokenOIDCHiveCacheBox() => _tokenOidcCacheClient.closeBox();
 }
