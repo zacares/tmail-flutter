@@ -43,4 +43,9 @@ class ThreadRobot extends CoreRobot {
     );
     await $.pumpAndSettle();
   }
+
+  Future<void> tapOnMailboxWithName(String name) async {
+    await $(name).tap();
+    await $.pumpAndSettle();
+  }
 }
