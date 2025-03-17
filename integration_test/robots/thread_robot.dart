@@ -33,4 +33,14 @@ class ThreadRobot extends CoreRobot {
   Future<void> openMailbox() async {
     await $(#mobile_mailbox_menu_button).tap();
   }
+
+  Future<void> pullToRefreshByEmailSubject(String subject) async {
+    await $(subject).waitUntilVisible();
+    await $.tester.fling(
+      $(subject),
+      const Offset(0, 300),
+      1000,
+    );
+    await $.pumpAndSettle();
+  }
 }
