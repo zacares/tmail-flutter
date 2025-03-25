@@ -90,6 +90,7 @@ import 'package:tmail_ui_user/features/mailbox_dashboard/domain/usecases/remove_
 import 'package:tmail_ui_user/features/home/data/exceptions/session_exceptions.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/controller/mailbox_dashboard_controller.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/extensions/open_and_close_composer_extension.dart';
+import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/extensions/remove_local_email_draft_extension.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/model/draggable_app_state.dart';
 import 'package:tmail_ui_user/features/manage_account/domain/state/get_all_identities_state.dart';
 import 'package:tmail_ui_user/features/manage_account/domain/usecases/get_all_identities_interactor.dart';
@@ -871,6 +872,9 @@ class ComposerController extends BaseController
     log('ComposerController::_handleSendMessages: resultState = $resultState');
     if (resultState is SendEmailSuccess || mailboxDashBoardController.validateSendingEmailFailedWhenNetworkIsLostOnMobile(resultState)) {
       _sendButtonState = ButtonState.enabled;
+      if (composerId != null) {
+        mailboxDashBoardController.removeLocalEmailDraft(composerId!);
+      }
       _closeComposerAction(result: resultState);
     } else if (resultState is SendEmailFailure && resultState.exception is SendingEmailCanceledException) {
       _sendButtonState = ButtonState.enabled;
@@ -1519,6 +1523,9 @@ class ComposerController extends BaseController
 
   void handleClickDeleteComposer(BuildContext context) {
     clearFocus(context);
+    if (composerId != null) {
+      mailboxDashBoardController.removeLocalEmailDraft(composerId!);
+    }
     _closeComposerAction();
   }
 
@@ -1905,6 +1912,9 @@ class ComposerController extends BaseController
 
     if (resultState is SaveEmailAsDraftsSuccess || resultState is UpdateEmailDraftsSuccess) {
       _closeComposerButtonState = ButtonState.enabled;
+      if (composerId != null) {
+        mailboxDashBoardController.removeLocalEmailDraft(composerId!);
+      }
       _closeComposerAction(result: resultState);
     } else if ((resultState is SaveEmailAsDraftsFailure && resultState.exception is SavingEmailToDraftsCanceledException) ||
         (resultState is UpdateEmailDraftsFailure && resultState.exception is SavingEmailToDraftsCanceledException)) {
