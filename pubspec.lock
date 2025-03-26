@@ -716,7 +716,7 @@ packages:
     description:
       path: flutter_charset_detector
       ref: main
-      resolved-ref: "52e07143c062cc3392707db07222e58d7b8a6913"
+      resolved-ref: "2746f182529c86f08a7c4097dc652282ad797651"
       url: "https://github.com/tddang-linagora/flutter_charset_detector.git"
     source: git
     version: "5.0.0"
