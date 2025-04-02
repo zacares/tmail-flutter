@@ -153,7 +153,7 @@ class ThreadView extends GetWidget<ThreadController>
                               DeleteActionType.all)
                           );
                         } else {
-                          return const SizedBox.shrink();
+                          return const SizedBox.shrink(key: ValueKey('trash_banner_not_visible'));
                         }
                       }),
                       Obx(() {
