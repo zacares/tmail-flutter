@@ -14,6 +14,7 @@ import 'package:model/email/mail_priority_header.dart';
 import 'package:model/extensions/account_id_extensions.dart';
 import 'package:model/extensions/email_address_extension.dart';
 import 'package:model/extensions/email_extension.dart';
+import 'package:model/extensions/email_id_extensions.dart';
 import 'package:model/extensions/session_extension.dart';
 import 'package:model/mailbox/presentation_mailbox.dart';
 import 'package:tmail_ui_user/features/caching/utils/cache_utils.dart';
@@ -223,6 +224,9 @@ extension CreateEmailRequestExtension on CreateEmailRequest {
       isMarkAsImportant: isMarkAsImportant,
       displayMode: displayMode.name,
       composerIndex: composerIndex,
+      draftHash: savedDraftHash,
+      actionType: savedActionType?.name,
+      draftEmailId: savedEmailDraftId?.asString,
     );
   }
 }

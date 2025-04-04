@@ -86,8 +86,6 @@ import 'package:tmail_ui_user/features/email/domain/usecases/transform_html_emai
 import 'package:tmail_ui_user/features/email/presentation/extensions/presentation_email_extension.dart';
 import 'package:tmail_ui_user/features/email/presentation/model/composer_arguments.dart';
 import 'package:tmail_ui_user/features/email/presentation/utils/email_utils.dart';
-import 'package:tmail_ui_user/features/mailbox_dashboard/domain/usecases/remove_composer_cache_by_id_on_web_interactor.dart';
-import 'package:tmail_ui_user/features/home/data/exceptions/session_exceptions.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/controller/mailbox_dashboard_controller.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/extensions/open_and_close_composer_extension.dart';
 import 'package:tmail_ui_user/features/mailbox_dashboard/presentation/extensions/remove_local_email_draft_extension.dart';
@@ -223,16 +221,13 @@ class ComposerController extends BaseController
   ButtonState _saveToDraftButtonState = ButtonState.enabled;
   ButtonState _sendButtonState = ButtonState.enabled;
   ButtonState printDraftButtonState = ButtonState.enabled;
-  int? _savedEmailDraftHash;
+  int? savedEmailDraftHash;
   bool restoringSignatureButton = false;
   bool synchronizeInitDraftHash = false;
   GlobalKey? responsiveContainerKey;
   EmailActionType? currentEmailActionType;
   EmailActionType? savedActionType;
   int minInputLengthAutocomplete = AppConfig.defaultMinInputLengthAutocomplete;
-
-  @visibleForTesting
-  int? get savedEmailDraftHash => _savedEmailDraftHash;
 
   GetEmailContentInteractor get getEmailContentInteractor => _getEmailContentInteractor;
 
@@ -300,7 +295,7 @@ class ComposerController extends BaseController
   void onClose() {
     _textEditorWeb = null;
     savedActionType = null;
-    _savedEmailDraftHash = null;
+    savedEmailDraftHash = null;
     currentEmailActionType = null;
     emailIdEditing = null;
     maxWithEditor = null;
@@ -447,82 +442,13 @@ class ComposerController extends BaseController
     });
   }
 
-  Future<void> _saveLocalEmailDraftAction() async {
-    autoCreateEmailTag();
-
-    final createEmailRequest = await _generateCreateEmailRequestToSaveAsCache();
-    if (createEmailRequest == null) return;
-
-    await _saveLocalEmailDraftInteractor.execute(
-      createEmailRequest,
-      mailboxDashBoardController.accountId.value!,
-      mailboxDashBoardController.sessionCurrent!.username);
-  }
-
-  Uri? _getUploadUriFromSession(Session session, AccountId accountId) {
+  Uri? getUploadUriFromSession(Session session, AccountId accountId) {
     try {
       return session.getUploadUri(accountId, jmapUrl: dynamicUrlInterceptors.jmapUrl);
     } catch (e) {
       logError('ComposerController::_getUploadUriFromSession:Exception = $e');
       return null;
     }
-  }
-
-  Future<CreateEmailRequest?> _generateCreateEmailRequestToSaveAsCache() async {
-    final arguments = composerArguments.value;
-    final session = mailboxDashBoardController.sessionCurrent;
-    final accountId = mailboxDashBoardController.accountId.value;
-
-    if (arguments == null || session == null || accountId == null) {
-      log('ComposerController::_generateCreateEmailRequest: SESSION or ACCOUNT_ID or ARGUMENTS is NULL');
-      return null;
-    }
-
-    String emailContent = await getContentInEditor();
-    if (currentEmailActionType == EmailActionType.compose) {
-      emailContent = await _composerRepository.removeCollapsedExpandedSignatureEffect(
-        emailContent: emailContent,
-      );
-    }
-    final uploadUri = _getUploadUriFromSession(session, accountId);
-
-    final composerIndex = composerId != null
-      ? mailboxDashBoardController.composerManager.getComposerIndex(composerId!)
-      : null;
-
-    return CreateEmailRequest(
-      session: session,
-      accountId: accountId,
-      emailActionType: arguments.emailActionType,
-      subject: subjectEmail.value ?? '',
-      emailContent: emailContent,
-      fromSender: arguments.presentationEmail?.from ?? {},
-      toRecipients: listToEmailAddress.toSet(),
-      ccRecipients: listCcEmailAddress.toSet(),
-      bccRecipients: listBccEmailAddress.toSet(),
-      replyToRecipients: listReplyToEmailAddress.toSet(),
-      hasRequestReadReceipt: hasRequestReadReceipt.value,
-      isMarkAsImportant: isMarkAsImportant.value,
-      identity: identitySelected.value,
-      attachments: uploadController.attachmentsUploaded,
-      inlineAttachments: uploadController.mapInlineAttachments,
-      outboxMailboxId: getOutboxMailboxIdForComposer(),
-      sentMailboxId: getSentMailboxIdForComposer(),
-      draftsMailboxId: getDraftMailboxIdForComposer(),
-      draftsEmailId: getDraftEmailId(),
-      answerForwardEmailId: arguments.presentationEmail?.id,
-      unsubscribeEmailId: arguments.previousEmailId,
-      messageId: arguments.messageId,
-      references: arguments.references,
-      emailSendingQueue: arguments.sendingEmail,
-      displayMode: screenDisplayMode.value,
-      uploadUri: uploadUri,
-      composerIndex: composerIndex,
-      composerId: composerId,
-      savedDraftHash: arguments.savedDraftHash ?? _savedEmailDraftHash,
-      savedActionType: savedActionType ?? currentEmailActionType,
-      savedEmailDraftId: emailIdEditing,
-    );
   }
 
   void _scrollControllerEmailAddressListener() {
@@ -1101,8 +1027,8 @@ class ComposerController extends BaseController
 
   Future<bool> _validateEmailChange() async {
     final newDraftHash = await _hashDraftEmail();
-    log('ComposerController::_validateEmailChange:newDraftHash = $newDraftHash | _savedEmailDraftHash = $_savedEmailDraftHash');
-    return _savedEmailDraftHash != newDraftHash;
+    log('ComposerController::_validateEmailChange:newDraftHash = $newDraftHash | savedEmailDraftHash = $savedEmailDraftHash');
+    return savedEmailDraftHash != newDraftHash;
   }
 
   Future<int> _hashDraftEmail() async {
@@ -1113,7 +1039,7 @@ class ComposerController extends BaseController
     );
     if (emailIdEditing != null &&
         savedActionType == EmailActionType.compose &&
-        currentEmailActionType == EmailActionType.reopenComposerBrowser) {
+        currentEmailActionType == EmailActionType.composeFromLocalEmailDraft) {
       emailContent = await _composerRepository.removeStyleLazyLoadDisplayInlineImages(
         emailContent: emailContent,
       );
@@ -1138,7 +1064,7 @@ class ComposerController extends BaseController
   }
 
   Future<void> _updateSavedEmailDraftHash() async {
-    _savedEmailDraftHash = await _hashDraftEmail();
+    savedEmailDraftHash = await _hashDraftEmail();
   }
 
   Future<void> initEmailDraftHash() async {
@@ -1148,13 +1074,13 @@ class ComposerController extends BaseController
 
     if (currentEmailActionType == EmailActionType.compose ||
         currentEmailActionType == EmailActionType.editDraft) {
-      _savedEmailDraftHash = currentDraftHash;
-    } else if (currentEmailActionType == EmailActionType.reopenComposerBrowser) {
-      _savedEmailDraftHash = oldSavedDraftHash;
+      savedEmailDraftHash = currentDraftHash;
+    } else if (currentEmailActionType == EmailActionType.composeFromLocalEmailDraft) {
+      savedEmailDraftHash = oldSavedDraftHash;
     }
-    log('ComposerController::initEmailDraftHash:oldSavedDraftHash = $oldSavedDraftHash | currentDraftHash = $currentDraftHash | _savedEmailDraftHash = $_savedEmailDraftHash');
+    log('ComposerController::initEmailDraftHash:oldSavedDraftHash = $oldSavedDraftHash | currentDraftHash = $currentDraftHash | savedEmailDraftHash = $savedEmailDraftHash');
 
-    isEmailChanged.value = currentDraftHash != _savedEmailDraftHash;
+    isEmailChanged.value = currentDraftHash != savedEmailDraftHash;
   }
 
   void handleClickSaveAsDraftsButton(BuildContext context) async {
