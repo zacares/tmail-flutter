@@ -33,7 +33,7 @@ class MarkMailboxAsReadScenario extends BaseTestScenario {
     );
     await mailboxMenuRobot.tapMarkAsRead();
     await threadRobot.openMailbox();
-    await _expectInboxUnreadCountInvisible();
+    _expectInboxUnreadCountInvisible();
   }
 
   Future<void> _expectInboxUnreadCountVisible() async {
@@ -45,7 +45,7 @@ class MarkMailboxAsReadScenario extends BaseTestScenario {
     }));
   }
 
-  Future<void> _expectInboxUnreadCountInvisible() async {
+  void _expectInboxUnreadCountInvisible() {
     expect(
       $(TrailingMailboxItemWidget)
         .which<TrailingMailboxItemWidget>((widget) {
