@@ -35,6 +35,7 @@ class LeadingMailboxItemWidget extends StatelessWidget {
       Visibility.maintain(
         visible: mailboxNode.hasChildren(),
         child: TMailButtonWidget.fromIcon(
+          key: const ValueKey('expand_mailbox_button'),
           icon: _getExpandIcon(context, imagePaths),
           iconColor: _expandIconColor,
           iconSize: 20,

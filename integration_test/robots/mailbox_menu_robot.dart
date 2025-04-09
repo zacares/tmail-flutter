@@ -1,6 +1,4 @@
 
-import 'package:core/presentation/resources/image_paths.dart';
-import 'package:core/presentation/views/button/tmail_button_widget.dart';
 import 'package:core/presentation/views/text/text_field_builder.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -52,10 +50,7 @@ class MailboxMenuRobot extends CoreRobot {
         return widget.mailboxNode.item.name?.name.toLowerCase() ==
           name.toLowerCase();
       })
-      .$(TMailButtonWidget)
-      .which<TMailButtonWidget>((widget) {
-        return widget.icon == ImagePaths().icArrowRight;
-      })
+      .$(#expand_mailbox_button)
       .tap();
   }
 
