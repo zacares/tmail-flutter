@@ -32,13 +32,13 @@ class MailboxMenuRobot extends CoreRobot {
     await $(AppLocalizations().newSubfolder).tap();
   }
 
-  Future<void> enterNewSubFolderName(String name) async {
+  Future<void> enterNewFolderName(String name) async {
     await $(MailboxCreatorView)
       .$(TextFieldBuilder)
       .enterText(name);
   }
 
-  Future<void> confirmCreateNewSubFolder() async {
+  Future<void> confirmCreateNewFolder() async {
     await $(MailboxCreatorView)
       .$(AppLocalizations().done)
       .tap();
