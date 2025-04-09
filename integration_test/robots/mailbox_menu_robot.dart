@@ -88,4 +88,8 @@ class MailboxMenuRobot extends CoreRobot {
     await $(AppLocalizations().delete).tap();
     await $.pumpAndSettle(duration: const Duration(seconds: 2));
   }
+
+  Future<void> tapAddNewFolderButton() async {
+    await $(#add_new_folder_button).tap();
+  }
 }

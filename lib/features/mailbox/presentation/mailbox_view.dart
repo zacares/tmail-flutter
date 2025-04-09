@@ -293,6 +293,7 @@ class MailboxView extends BaseMailboxView {
                   onTapActionCallback: () => controller.openSearchViewAction(context)
                 ),
                 TMailButtonWidget.fromIcon(
+                  key: const ValueKey('add_new_folder_button'),
                   icon: controller.imagePaths.icAddNewFolder,
                   iconColor: AppColor.steelGrayA540,
                   iconSize: 20,
