@@ -229,7 +229,7 @@ class FcmMessageController extends PushBaseController {
 
   @override
   void handleSuccessViewState(Success success) {
-    log('FcmMessageController::_handleSuccessViewState(): $success');
+    log('FcmMessageController::_handleSuccessViewState(): ${success.runtimeType}');
     if (success is GetSessionSuccess) {
       _handleGetSessionSuccess(success);
     } else if (success is GetStoredTokenOidcSuccess) {
