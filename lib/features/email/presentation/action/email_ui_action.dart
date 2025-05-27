@@ -49,3 +49,5 @@ class PerformEmailActionInThreadDetailAction extends EmailUIAction {
     presentationEmail,
   ];
 }
+
+class RefreshThreadDetailAction extends EmailUIAction {}

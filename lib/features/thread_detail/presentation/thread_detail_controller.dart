@@ -18,6 +18,7 @@ import 'package:model/extensions/keyword_identifier_extension.dart';
 import 'package:model/extensions/session_extension.dart';
 import 'package:model/mailbox/presentation_mailbox.dart';
 import 'package:tmail_ui_user/features/base/base_controller.dart';
+import 'package:tmail_ui_user/features/email/presentation/action/email_ui_action.dart';
 import 'package:tmail_ui_user/features/email/presentation/model/email_loaded.dart';
 import 'package:tmail_ui_user/features/email/domain/state/download_attachment_for_web_state.dart';
 import 'package:tmail_ui_user/features/email/domain/state/mark_as_email_read_state.dart';
@@ -153,6 +154,24 @@ class ThreadDetailController extends BaseController {
         }
       }
     });
+    ever(mailboxDashBoardController.emailUIAction, (action) {
+      if (action is RefreshThreadDetailAction) {
+        if (session != null &&
+            accountId != null &&
+            sentMailboxId != null &&
+            ownEmailAddress != null &&
+            mailboxDashBoardController.selectedEmail.value?.threadId != null) {
+          consumeState(_getEmailIdsByThreadIdInteractor.execute(
+            mailboxDashBoardController.selectedEmail.value!.threadId!,
+            session!,
+            accountId!,
+            sentMailboxId!,
+            ownEmailAddress!,
+            updateCurrentThreadDetail: true,
+          ));
+        }
+      }
+    });
   }
 
   void reset() {
@@ -167,7 +186,7 @@ class ThreadDetailController extends BaseController {
   void handleSuccessViewState(success) {
     if (success is GetThreadByIdSuccess) {
       handleGetEmailIdsByThreadIdSuccess(success);
-      initializeThreadDetailEmails();
+      initializeThreadDetailEmails(success);
     } else if (success is GetEmailsByIdsSuccess) {
       handleGetEmailsByIdsSuccess(success);
     } else if (success is MarkAsEmailReadSuccess) {

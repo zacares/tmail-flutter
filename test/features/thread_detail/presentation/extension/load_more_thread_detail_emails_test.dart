@@ -143,6 +143,7 @@ void main() {
     when(controller.session).thenReturn(SessionFixtures.aliceSession);
     when(controller.accountId).thenReturn(AccountFixtures.aliceAccountId);
     when(controller.getEmailsByIdsInteractor).thenReturn(getEmailsByIdsInteractor);
+    when(controller.additionalProperties).thenReturn(Properties.empty());
     when(controller.mailboxDashBoardController).thenReturn(mailboxDashBoardController);
     when(mailboxDashBoardController.selectedEmail).thenReturn(Rxn());
     
@@ -187,6 +188,7 @@ void main() {
     when(controller.session).thenReturn(SessionFixtures.aliceSession);
     when(controller.accountId).thenReturn(AccountFixtures.aliceAccountId);
     when(controller.getEmailsByIdsInteractor).thenReturn(getEmailsByIdsInteractor);
+    when(controller.additionalProperties).thenReturn(Properties.empty());
     when(controller.mailboxDashBoardController).thenReturn(mailboxDashBoardController);
     when(mailboxDashBoardController.selectedEmail).thenReturn(Rxn());
     

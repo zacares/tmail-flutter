@@ -1,16 +1,30 @@
 import 'package:dartz/dartz.dart';
+import 'package:jmap_dart_client/jmap/mail/email/email.dart';
 import 'package:tmail_ui_user/features/email/presentation/utils/email_utils.dart';
 import 'package:tmail_ui_user/features/home/data/exceptions/session_exceptions.dart';
 import 'package:tmail_ui_user/features/thread_detail/domain/state/get_emails_by_ids_state.dart';
+import 'package:tmail_ui_user/features/thread_detail/domain/state/get_thread_by_id_state.dart';
 import 'package:tmail_ui_user/features/thread_detail/presentation/thread_detail_controller.dart';
 import 'package:tmail_ui_user/features/thread_detail/presentation/utils/thread_detail_presentation_utils.dart';
 
 extension InitializeThreadDetailEmails on ThreadDetailController {
-  void initializeThreadDetailEmails() {
-    final emailIdsToLoadMetaData = ThreadDetailPresentationUtils.getFirstLoadEmailIds(
-      emailIdsPresentation.keys.toList(),
-      selectedEmailId: mailboxDashBoardController.selectedEmail.value?.id,
-    );
+  void initializeThreadDetailEmails(GetThreadByIdSuccess success) {
+    List<EmailId> emailIdsToLoadMetaData = [];
+    if (success.updateCurrentThreadDetail) {
+      emailIdsToLoadMetaData = emailIdsPresentation
+        .entries
+        .where((entry) => entry.value != null)
+        .map((entry) => entry.key)
+        .toList()
+        ..addAll(success.emailIds.where(
+          (emailId) => !emailIdsPresentation.keys.contains(emailId),
+        ));
+    } else {
+      emailIdsToLoadMetaData = ThreadDetailPresentationUtils.getFirstLoadEmailIds(
+        emailIdsPresentation.keys.toList(),
+          selectedEmailId: mailboxDashBoardController.selectedEmail.value?.id,
+      );
+    }
 
     if (accountId == null || session == null) {
       consumeState(Stream.value(Left(GetEmailsByIdsFailure(
@@ -26,6 +40,7 @@ extension InitializeThreadDetailEmails on ThreadDetailController {
         session!,
         accountId!,
       ).union(additionalProperties),
+      updateCurrentThreadDetail: success.updateCurrentThreadDetail,
     ));
   }
 }
