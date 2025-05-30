@@ -35,28 +35,17 @@ class EmailCacheManager {
     final nestedKey = TupleKey(accountId.asString, userName.value).encodeKey;
     log('EmailCacheManager::getAllEmail()::nestedKey = $nestedKey');
     final emailCacheList = await _emailCacheClient.getListByNestedKey(nestedKey);
+    log('EmailCacheManager::getAllEmail()::emailCacheList length = ${emailCacheList.length} ================');
     final emailList = emailCacheList
       .toEmailList()
       .where((email) => _filterEmailByMailbox(email, filterOption, inMailboxId))
       .toList();
 
-    log('DATPH EmailCacheManager::getAllEmail(): length ${emailList.length} ================');
-    for (final emailCache in emailList) {
+    log('DATPH EmailCacheManager::getAllEmail(): emailList length ${emailList.length} ================');
+    for (final emailCache in emailCacheList) {
       log('DATPH EmailCacheManager::getAllEmail(): ${emailCache.id} - ${emailCache.subject} - ${emailCache.keywords} - ${emailCache.mailboxIds}');
     }
     log('DATPH EmailCacheManager::getAllEmail(): ================');
-
-    final allEmailCacheList = await _emailCacheClient.getAll();
-    final allEmailCacheListByFilter = allEmailCacheList
-      .toEmailList()
-      .where((email) => _filterEmailByMailbox(email, filterOption, inMailboxId))
-      .toList();
-
-    log('DATVU::EmailCacheManager::getAllEmail():ALL:: length = ${allEmailCacheListByFilter.length} ================');
-    for (final emailCache in allEmailCacheListByFilter) {
-      log('DATVU::EmailCacheManager::getAllEmail():ALL:: ${emailCache.id} - ${emailCache.subject} - ${emailCache.keywords} - ${emailCache.mailboxIds}');
-    }
-    log('DATVU::EmailCacheManager::getAllEmail():ALL:: END ================================');
 
     if (sort != null) {
       for (var comparator in sort) {
@@ -71,11 +60,12 @@ class EmailCacheManager {
   }
 
   bool _filterEmailByMailbox(Email email, FilterMessageOption option, MailboxId? inMailboxId) {
-    if (inMailboxId != null) {
-      return email.belongTo(inMailboxId) && option.filterEmail(email);
-    } else {
-      return option.filterEmail(email);
-    }
+    log('EmailCacheManager::_filterEmailByMailbox()::inMailboxId = $inMailboxId | option = $option | email = ${email.id} - ${email.subject} - ${email.keywords} - ${email.mailboxIds}');
+    bool isBelongToMailbox = inMailboxId != null
+        ? email.belongTo(inMailboxId) && option.filterEmail(email)
+        : option.filterEmail(email);
+    log('EmailCacheManager::_filterEmailByMailbox()::isBelongToMailbox = $isBelongToMailbox');
+    return isBelongToMailbox;
   }
 
   Future<void> update(
@@ -102,9 +92,7 @@ class EmailCacheManager {
     }
     log('EmailCacheManager::update() start to get all in email cache ================');
     final listEmailCache = await _emailCacheClient.getAll();
-    for (final emailCache in listEmailCache) {
-      log('EmailCacheManager::update() cached ${emailCache.id} - ${emailCache.subject} - ${emailCache.keywords} - ${emailCache.mailboxIds}');
-    }
+    log('EmailCacheManager::update() cached length = ${listEmailCache.length} ================');
     log('EmailCacheManager::update() end to get all in email cache ================');
   }
 
@@ -119,11 +107,6 @@ class EmailCacheManager {
       log('EmailCacheManager::clean():: listEmailIdCacheExpire = $listEmailIdCacheExpire ================');
       await _emailCacheClient.deleteMultipleItem(listEmailIdCacheExpire);
       log('EmailCacheManager::clean() end deleteMultipleItem =================');
-  }
-
-  Future<void> clearAll() async {
-    log('EmailCacheManager::clearAll() ================');
-    return await _emailCacheClient.clearAllData();
   }
 
   Future<void> storeEmail(AccountId accountId, UserName userName, EmailCache emailCache) {
@@ -151,7 +134,7 @@ class EmailCacheManager {
   Future<EmailCache> getStoredEmail(AccountId accountId, UserName userName, EmailId emailId) async {
     final keyCache = TupleKey(emailId.asString, accountId.asString, userName.value).encodeKey;
     log('EmailCacheManager::getStoredEmail()::keyCache = $keyCache');
-    final emailCache = await _emailCacheClient.getItem(keyCache, needToReopen: true);
+    final emailCache = await _emailCacheClient.getItem(keyCache);
     log('EmailCacheManager::getStoredEmail()::${emailCache?.id} - ${emailCache?.subject} - ${emailCache?.keywords} - ${emailCache?.mailboxIds}');
     if (emailCache != null) {
       return emailCache;
@@ -174,9 +157,6 @@ class EmailCacheManager {
     }
     final emails = await _emailCacheClient.getValuesByListKey(keys);
     log('EmailCacheManager::getMultipleStoredEmails()::emails length = ${emails.length} ================');
-    for (final email in emails) {
-      log('EmailCacheManager::getMultipleStoredEmails()::${email.id} - ${email.subject} - ${email.keywords} - ${email.mailboxIds}');
-    }
     return emails;
   }
 }
