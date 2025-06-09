@@ -41,6 +41,21 @@
            android:resource="@drawable/notification_icon" />
 
         <activity
+            android:name=".SplashActivity"
+            android:theme="@style/SplashTheme"
+            android:exported="true">
+
+            <meta-data
+                android:name="io.flutter.embedding.android.SplashScreenDrawable"
+                android:resource="@drawable/launch_background" />
+            
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
@@ -61,13 +76,13 @@
                  screen fades out. A splash screen is useful to avoid any visual
                  gap between the end of Android's launch screen and the painting of
                  Flutter's first frame. -->
-            <meta-data
+            <!-- <meta-data
                 android:name="io.flutter.embedding.android.SplashScreenDrawable"
                 android:resource="@drawable/launch_background" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+            </intent-filter> -->
 
             <intent-filter>
                 <action android:name="android.intent.action.VIEW"/>
